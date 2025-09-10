@@ -1,12 +1,12 @@
 package com.example.demo.models;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,10 +27,10 @@ public class BaseModel {
 	
 	@CreationTimestamp
 	@Column(nullable = false,updatable = false)
-	private Date createdAt;
+	private LocalDateTime createAt;
 	
 	@UpdateTimestamp
 	@Column(nullable = false)
-	private Date updatedAt;
+	private LocalDateTime updatedAt;
 
 }

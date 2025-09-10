@@ -1,5 +1,8 @@
 package com.example.demo.models;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -20,8 +23,10 @@ public class User extends BaseModel{
 	private String name;
 	private String email;
 	
-	@OneToMany(mappedBy = "user")
-	private Address address;
+	private String password;
+	
+	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+	private List<Address> address;
 	
 	
 	
