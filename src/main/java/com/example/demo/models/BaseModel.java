@@ -27,7 +27,7 @@ public class BaseModel {
 	
 	@CreationTimestamp
 	@Column(nullable = false,updatable = false)
-	private LocalDateTime createAt;
+	private LocalDateTime createdAt;
 	
 	@UpdateTimestamp
 	@Column(nullable = false)

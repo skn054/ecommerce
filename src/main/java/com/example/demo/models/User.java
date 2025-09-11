@@ -26,7 +26,7 @@ public class User extends BaseModel{
 	private String password;
 	
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-	private List<Address> address;
+	private List<Address> addresses;
 	
 	
 	
