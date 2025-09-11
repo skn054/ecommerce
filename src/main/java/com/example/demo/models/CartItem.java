@@ -24,7 +24,8 @@ public class CartItem extends BaseModel{
 	private Cart cart;
 	
 	
-	@OneToOne
+	@ManyToOne
+	@JoinColumn(name="product_id")
 	private Product product;
 	
 	private Long quantity;
