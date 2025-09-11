@@ -2,6 +2,8 @@ package com.example.demo.dto;
 
 import java.math.BigDecimal;
 
+import com.example.demo.models.Product;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -35,6 +37,19 @@ public class ResponseProductDto{
 	
 	@NotBlank(message = "Category cannot be blank")
 	private String categoryName;
+	
+	
+	
+	  public static ResponseProductDto mapToResponseDto(Product product) {
+	         return ResponseProductDto.builder()
+	                 .id(product.getId()) 
+	                 .name(product.getName())
+	                 .description(product.getDescription())
+	                 .price(product.getPrice())
+	                 .stockQuantity(product.getStockQuantity())
+	                 .categoryName(product.getCategory().getName()) 
+	                 .build();
+	     }
 	
 	
 

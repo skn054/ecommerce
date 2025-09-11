@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
+import java.util.List;
 import java.util.Locale.Category;
+import java.util.stream.Collectors;
+
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -24,10 +27,6 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    
-	
-	
-	
      public ResponseProductDto createProduct(CreateProductDto productdto) {
     	 	
     	 Categorys category =  categoryRepository
@@ -51,19 +50,31 @@ public class ProductService {
     	 
     	Product savedProduct =  productRepository.save(product);
     	
-    	return mapToResponseDto(savedProduct);
+    	return ResponseProductDto.mapToResponseDto(savedProduct);
+    	
     	 
      }
      
-     private ResponseProductDto mapToResponseDto(Product product) {
-         return ResponseProductDto.builder()
-                 .id(product.getId()) 
-                 .name(product.getName())
-                 .description(product.getDescription())
-                 .price(product.getPrice())
-                 .stockQuantity(product.getStockQuantity())
-                 .categoryName(product.getCategory().getName()) 
-                 .build();
+     public List<ResponseProductDto> getAllProducts() {
+    	  List<Product> products =   productRepository.findAll();
+    	  
+    	  return products.stream().map(ResponseProductDto::mapToResponseDto).collect(Collectors.toList());
+    	  
      }
+     
+     public Product getProductById(Long id) {
+    	    return productRepository.findById(id).orElseThrow();
+     }
+     
+     public ResponseProductDto updateProductById(Long id,CreateProductDto productDto) {
+    	 Categorys categorys = categoryRepository.findByNameIgnoreCase(productDto.getCategory()).orElseThrow();
+    	 Product product = productRepository.findById(id).orElseThrow();
+    	 Product updatedProduct = CreateProductDto.mapToProduct(productDto, categorys);
+    	 updatedProduct.setId(id);
+    	 Product savedProduct = productRepository.save(updatedProduct);
+    	 return ResponseProductDto.mapToResponseDto(savedProduct);
+     }
+     
+   
 
 }
