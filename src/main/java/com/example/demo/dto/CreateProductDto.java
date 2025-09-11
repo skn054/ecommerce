@@ -1,23 +1,20 @@
-package com.example.demo.models;
+package com.example.demo.dto;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product extends BaseModel{
+public class CreateProductDto {
 	
 	private String name;
 	
@@ -29,14 +26,6 @@ public class Product extends BaseModel{
 	
 	private BigDecimal price;
 	
-	
-	@ManyToOne
-	@JoinColumn(name = "category_id")
-	private Categorys category;
-	
-	
-	
-	
-	
+	private String category;
 
 }
