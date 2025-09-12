@@ -1,16 +1,20 @@
 package com.example.demo.controller;
 import com.example.demo.service.ProductService;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +33,7 @@ public class ProductController {
     }
 	
 	@PostMapping
-	public ResponseEntity<ResponseProductDto> addProdcuct(@RequestBody CreateProductDto product) {
+	public ResponseEntity<ResponseProductDto> addProduct(@Valid @RequestBody CreateProductDto product) {
 			
 		ResponseProductDto productDto = productService.createProduct(product);
 		
@@ -45,7 +49,7 @@ public class ProductController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+	public ResponseEntity<ResponseProductDto> getProductById(@PathVariable Long id) {
 		return ResponseEntity.status(HttpStatus.OK).body(productService.getProductById(id));
 	}
 	
@@ -53,6 +57,22 @@ public class ProductController {
 	public ResponseEntity<ResponseProductDto> updateProduct(@RequestBody CreateProductDto productDto, @PathVariable Long id) {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(productService.updateProductById(id, productDto));
+	}
+	
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+		
+		productService.deleteProduct(id);
+		return ResponseEntity.noContent().build();
+		
+	}
+	
+	@GetMapping("/search")
+	public ResponseEntity<List<ResponseProductDto>> searchProductByKeyword(@RequestParam String keyword) {
+		
+		return ResponseEntity.status(HttpStatus.OK).body(productService.searchProductByKeyword(keyword));    
+		
 	}
 	
 	

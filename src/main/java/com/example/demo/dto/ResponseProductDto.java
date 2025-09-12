@@ -21,21 +21,20 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ResponseProductDto{
 	
-	@NotBlank(message = "Product name cannot be blank")
+	
 	private Long id;
+	
 	private String name;
 	
 	private String description;
 	
-	@NotNull(message = "Stock quantity cannot be null")
-	@Min(value = 0, message = "Stock quantity cannot be negative")
+	
 	private Long stockQuantity;
 	
-	 @NotNull(message = "Price cannot be null")
-	@DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than zero")
+	
 	private BigDecimal price;
 	
-	@NotBlank(message = "Category cannot be blank")
+	
 	private String categoryName;
 	
 	
