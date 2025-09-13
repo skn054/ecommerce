@@ -18,7 +18,7 @@ import com.example.demo.dto.ResponseUserDto;
 import com.example.demo.models.User;
 
 @RestController
-@RequestMapping("?/api/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;

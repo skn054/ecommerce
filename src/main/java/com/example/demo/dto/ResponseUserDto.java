@@ -26,7 +26,7 @@ public class ResponseUserDto {
 	private String firstName;
 	private String lastName;
 	private String email;
-	private List<AddressDto> addressDto;
+	private List<AddressDto> addresses;
 	
 	
 	public static ResponseUserDto mapToResponseUserDto(User savedUser) {
@@ -48,7 +48,7 @@ public class ResponseUserDto {
 				.id(savedUser.getId())
 				.firstName(savedUser.getFirstName())
 				.lastName(savedUser.getLastName())
-				.addressDto(addressDtos)
+				.addresses(addressDtos)
 				.build();
 		
 		

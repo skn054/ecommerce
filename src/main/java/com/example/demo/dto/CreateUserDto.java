@@ -23,6 +23,6 @@ public class CreateUserDto {
 	private String email;
 	private String phone;
 	private String password;
-	private List<AddressDto> addressDto;
+	private List<AddressDto> addresses;
 
 }

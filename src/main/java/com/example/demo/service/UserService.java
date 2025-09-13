@@ -11,7 +11,7 @@ import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.CreateUserDto;
 import com.example.demo.dto.ResponseUserDto;
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.exception.UserNotFoundException;
+
 import com.example.demo.models.Address;
 import com.example.demo.models.User;
 
@@ -51,7 +51,7 @@ public class UserService {
 
 
 	private List<Address> mapAddressDtoToAdress(CreateUserDto userDto, User user) {
-		return userDto.getAddressDto()
+		return userDto.getAddresses()
 								.stream()
 								.map(addressDto ->{
 									
