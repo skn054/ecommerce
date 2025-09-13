@@ -75,7 +75,7 @@ public class ProductService {
      
      public ResponseProductDto updateProductById(Long id,CreateProductDto productDto) {
     	 Categorys category = categoryRepository.findByNameIgnoreCase(productDto.getCategory())
-    			 .orElseThrow(() -> new ResourceNotFoundException("Category not found with name: \" : " + productDto.getCategory()));
+    			 .orElseThrow(() -> new ResourceNotFoundException("Category not found with name : " + productDto.getCategory()));
     	 Product productToUpdate = getProductByIdInternal(id);
     	 productToUpdate.setName(productDto.getName());
     	 productToUpdate.setDescription(productDto.getDescription());
@@ -89,7 +89,7 @@ public class ProductService {
      }
      
      
-     public void deleteProduct(Long id) {
+     public void deleteProductById(Long id) {
     	 
     	 if(!productRepository.existsById(id)) {
     		 throw new ResourceNotFoundException("Product not found with id: " + id);

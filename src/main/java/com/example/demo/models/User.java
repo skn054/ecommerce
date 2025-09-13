@@ -20,10 +20,11 @@ import lombok.Setter;
 @Builder
 public class User extends BaseModel{
 	
-	private String name;
+	private String firstName;
+	private String lastName;
 	private String email;
 	
-	private String password;
+	private String phone;
 	
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
 	private List<Address> addresses;
