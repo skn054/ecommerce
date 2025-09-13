@@ -7,9 +7,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.AddressDto;
 import com.example.demo.dto.CreateUserDto;
 import com.example.demo.dto.ResponseUserDto;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.UserNotFoundException;
+import com.example.demo.models.Address;
 import com.example.demo.models.User;
 
 @Service
@@ -33,11 +36,36 @@ public class UserService {
 				.firstName(userDto.getFirstName())
 				.lastName(userDto.getLastName())
 				.phone(userDto.getPhone())
-				.addresses(Arrays.asList(userDto.getAddress()))
+				.pasword(userDto.getPassword())
 				.build();
 		
+		
+		List<Address> addresses = mapAddressDtoToAdress(userDto, user);
+		
+		user.setAddresses(addresses);
 		User savedUser = userRepository.save(user);
 		return ResponseUserDto.mapToResponseUserDto(savedUser);
+	}
+
+
+
+
+	private List<Address> mapAddressDtoToAdress(CreateUserDto userDto, User user) {
+		return userDto.getAddressDto()
+								.stream()
+								.map(addressDto ->{
+									
+									Address address = Address
+											.builder()
+											.city(addressDto.getCity())
+											.country(addressDto.getCountry())
+											.state(addressDto.getState())
+											.street(addressDto.getStreet())
+											.zipcode(addressDto.getZipcode())
+											.user(user)
+											.build();
+									return address;
+								}).collect(Collectors.toList());
 	}
 	
 	
@@ -55,13 +83,17 @@ public class UserService {
 
 
 	private User getUserByInternalId(Long id) {
-		return userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User Not Found By "+id));
+		return userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User Not Found By "+id));
 	}
 
 	
 	public ResponseUserDto updateUser(CreateUserDto userDto,Long id) {
+		
+	
 		User user = getUserByInternalId(id);
-		user.setAddresses(Arrays.asList(userDto.getAddress()));
+		List<Address> address = mapAddressDtoToAdress(userDto, user);
+		
+		user.setAddresses(address);
 		user.setEmail(userDto.getEmail());
 		user.setFirstName(userDto.getFirstName());
 		user.setLastName(userDto.getLastName());

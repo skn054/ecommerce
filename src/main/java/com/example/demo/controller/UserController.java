@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CreateUserDto;
 import com.example.demo.dto.ResponseUserDto;
 import com.example.demo.models.User;
 
-@RestController("/api/users")
+@RestController
+@RequestMapping("?/api/users")
 public class UserController {
 
     private final UserService userService;

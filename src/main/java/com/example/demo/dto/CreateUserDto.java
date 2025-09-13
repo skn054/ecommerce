@@ -1,6 +1,7 @@
 package com.example.demo.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.example.demo.models.Address;
 
@@ -21,6 +22,7 @@ public class CreateUserDto {
 	private String lastName;
 	private String email;
 	private String phone;
-	private Address address;
+	private String password;
+	private List<AddressDto> addressDto;
 
 }
