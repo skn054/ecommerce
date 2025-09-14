@@ -31,6 +31,17 @@ public class Cart extends BaseModel{
 	 @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL)
 	 private List<CartItem> cartItems = new ArrayList<>();
 	 
+	 
+	 public void addItem(CartItem item) {
+		 this.cartItems.add(item);
+		 item.setCart(this);
+	 }
+	 
+	 public void removeItem(CartItem item) {
+		 this.cartItems.remove(item);
+		 item.setCart(null);
+	 }
+	 
 	
 
 }

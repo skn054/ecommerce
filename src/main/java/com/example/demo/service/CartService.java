@@ -1,8 +1,10 @@
 package com.example.demo.service;
-import com.example.demo.repository.CartItemRepoistory;
+import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.CartItemDto;
+import com.example.demo.dto.CartResponseDto;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.models.Cart;
 import com.example.demo.models.CartItem;
@@ -25,9 +28,9 @@ public class CartService {
     
     private final ProductRepository productRepository;
     
-    private final CartItemRepoistory cartItemRepoistory;
+    private final CartItemRepository cartItemRepoistory;
 
-    public CartService(UserRepository userRepository, CartRepository cartRepository,ProductRepository productRepository,CartItemRepoistory cartItemRepoistory) {
+    public CartService(UserRepository userRepository, CartRepository cartRepository,ProductRepository productRepository,CartItemRepository cartItemRepoistory) {
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
@@ -37,7 +40,8 @@ public class CartService {
 	
 	
 	
-	public void addProductToCart(Long UserId, CartItemDto cartItemDto) {
+    @Transactional
+	public void addProductToCart(Long userId, CartItemDto cartItemDto) {
 		
 		//check if user exists? if doesn't throw exception. 
 		// If user exists, check if cart exists for a user? If cart exists then check if product and exist. If stock exists.
@@ -46,50 +50,59 @@ public class CartService {
 		// add product to cart.
 	
 		
-		User user = userRepository.findById(UserId).orElseThrow(()-> new ResourceNotFoundException("User not found with id " + UserId));
+		User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found with id " + userId));
 		
-		Optional<Cart> cart =  cartRepository.findByUserId(UserId);
-		if(cart.isEmpty()) {
-			// create a cart and add product
-			Cart c = Cart.builder()
-					.user(user)
-					.build();
-			Optional<Product> product = productRepository.findById(cartItemDto.getProductId());
-			if(product.isEmpty()) {
-				throw new ResourceNotFoundException("Product not found with id"+ cartItemDto.getProductId());
-			}
-			CartItem item = CartItem.builder().cart(c).product(product.get()).quantity(cartItemDto.getQuantity()).build();
-			
-			c.setCartItems(Arrays.asList(item));
-			
-			cartRepository.save(c);
-			
-			
-			
-		}else {
-			
-			 Optional<CartItem> cartItemOptional =  cartItemRepoistory.findByUserAndProduct(UserId, cartItemDto.getProductId());
-			 if(cartItemOptional.isEmpty()) {
-				 //create a new cart item and add product
-				 Optional<Product> product = productRepository.findById(cartItemDto.getProductId());
-					if(product.isEmpty()) {
-						throw new ResourceNotFoundException("Product not found with id"+ cartItemDto.getProductId());
-					}
-					CartItem item = CartItem.builder().cart(cart.get()).product(product.get()).quantity(cartItemDto.getQuantity()).build();
-					
-					cartItemRepoistory.save(item);
-			 }
-			 else {
-				 // update quantity of product.
-				 CartItem cartItem = cartItemOptional.get();
-				 cartItem.setQuantity(cartItemDto.getQuantity());
-				 cartItemRepoistory.save(cartItem);
-			 }
-			
+		Product product = productRepository.findById(cartItemDto.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + cartItemDto.getProductId()));
+		
+		if(product.getStockQuantity() < cartItemDto.getQuantity()) {
+			 throw new RuntimeException("Not enough stock for product: " + product.getName());
 		}
 		
-		
+		 Cart cart = cartRepository.findByUser(user)
+	                .orElseGet(() -> {
+	                    Cart newCart = Cart.builder().user(user).build();
+	                    return cartRepository.save(newCart);
+	                });
+		 
+		 Optional<CartItem> existingCartItemOpt = cartItemRepoistory.findByCartAndProduct(cart, product);
+		 if(existingCartItemOpt.isPresent()) {
+			 
+			 CartItem existingItem = existingCartItemOpt.get();
+			 existingItem.setQuantity(existingItem.getQuantity() + cartItemDto.getQuantity());
+			 cartItemRepoistory.save(existingItem);
+		 }else {
+			 
+			 CartItem newCartItem = CartItem.builder()
+					 .product(product)
+					 .quantity(cartItemDto.getQuantity())
+					 .cart(cart)
+					 .build();
+			 
+			 cartItemRepoistory.save(newCartItem);
+			 
+			 
+		 }
+		 		
 		
 	}
+    
+    public CartResponseDto getCart(Long userId) {
+    	
+    	User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found with id" + userId));
+    	
+    	Cart cart = cartRepository.findByUser(user).orElseThrow(()->new ResourceNotFoundException("Cart not found for user with id "+ userId));
+    	
+    	return CartResponseDto.maptoCartResponseDto(cart);
+    	
+    }
+    
+    public void deleteCart(Long userId) {
+    	
+    	User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found with id"+ userId));
+    	Cart cart = cartRepository.findByUser(user).orElseThrow(()-> new ResourceNotFoundException("Cart not found for user with id"+ userId));
+    	
+    	cartRepository.delete(cart);
+    }
 
 }
