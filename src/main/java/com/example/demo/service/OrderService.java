@@ -56,35 +56,35 @@ public class OrderService {
 				.status(OrderStatus.PENDING)
 				.build();
 		
-		cart.getCartItems().forEach(item->{
+		List<OrderItem>  orderItems =  cart.getCartItems().stream().map(item->{
 			
-			OrderItem orderItem = OrderItem.builder()
-					.order(order)
-					.product(item.getProduct())
-					.quantity(item.getQuantity())
-					.price(item.getProduct().getPrice())
-					.build();
+			Product product = item.getProduct();
 			
-			order.addOrderItem(orderItem);
-		});
-		
-		
-		
-		order.getOrderItems().forEach(orderItem -> {
-			Product product = orderItem.getProduct();
+			if (product.getStockQuantity() < item.getQuantity()) {
+	            throw new InsufficientStockException("Not enough stock for " + product.getName());
+	        }
 			
-			if(product.getStockQuantity() < orderItem.getQuantity()) {
-				throw new InsufficientStockException("Not enough stock for " + product.getName() + " while placing order.");
-			}
-			
-			long newStock = product.getStockQuantity() - orderItem.getQuantity();
+			long newStock = product.getStockQuantity() - item.getQuantity();
 			product.setStockQuantity(newStock);
 			
 			/// No need to call productRepository.save(product) here!
 		    // Because the method is @Transactional, Hibernate's "dirty checking"
 		    // will automatically detect the change to the product entity
 		    // and include it in the final transaction commit.
-		});
+			
+			
+			return OrderItem.builder()
+					.product(product)
+					.quantity(item.getQuantity())
+					.price(item.getProduct().getPrice())
+					.build();
+			
+			
+		}).collect(Collectors.toList());
+		
+		
+		//build two way relation
+		orderItems.forEach(order::addOrderItem);
 		
 		
 		//calculate order price;

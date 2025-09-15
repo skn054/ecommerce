@@ -3,6 +3,7 @@ package com.example.demo.dto;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.demo.models.Order;
 
@@ -21,7 +22,6 @@ public class OrderResponseDto {
 	
 	private Long orderId;
 	
-	private String city;
 	
 	private Long userId;
 	
@@ -35,21 +35,25 @@ public class OrderResponseDto {
 	
 	public static OrderResponseDto mapToOrderDto(Order order) {
 		
+		
+		 List<OrderItemDto> itemDtos = order.getOrderItems().stream()
+		            .map(OrderItemDto::mapToOrderItemDto) // Use the existing static method
+		            .collect(Collectors.toList());
+		 
+		 AddressDto address = AddressDto.getAddressDto(order.getShippingAddress());
+		 
 		OrderResponseDto responseDto = OrderResponseDto.builder()
 				.orderId(order.getId())
-				.city(order.getShippingAddress().getCity())
 				.userId(order.getUser().getId())
 				.totalAmount(order.getTotalAmount())
 				.status(order.getStatus().name())
+				.shippingAddress(address)
+				.orderItemList(itemDtos)
 				.build();
 		
-		order.getOrderItems().forEach(item ->{
-			
-			OrderItemDto dtoItem = OrderItemDto.mapToOrderItemDto(item);
-			responseDto.orderItemList.add(dtoItem);
-		});
 		
-		AddressDto address = AddressDto.getAddressDto(order.getShippingAddress());
+		
+		
 		responseDto.setShippingAddress(address);
 		return responseDto;
 				

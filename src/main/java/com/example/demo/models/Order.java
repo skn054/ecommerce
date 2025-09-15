@@ -52,7 +52,7 @@ public class Order extends BaseModel{
 	 
 	 
 	 public void addOrderItem(OrderItem item) {
-		 orderItems.add(item);
+		 this.orderItems.add(item);
 		 item.setOrder(this);
 	 }
 	 
