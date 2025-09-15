@@ -38,6 +38,7 @@ public class Order extends BaseModel{
 	
 	
 	 @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+	 @Builder.Default
 	 private List<OrderItem> orderItems = new ArrayList<>();
 	 
 	 
