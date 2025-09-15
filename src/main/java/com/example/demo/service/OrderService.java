@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.OrderResponseDto;
+import com.example.demo.exception.InsufficientStockException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.models.Cart;
 import com.example.demo.models.Order;
 import com.example.demo.models.OrderItem;
 import com.example.demo.models.OrderStatus;
+import com.example.demo.models.Product;
 import com.example.demo.models.User;
 import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.OrderRepository;
@@ -51,10 +53,10 @@ public class OrderService {
 		Order order = Order.builder()
 				.user(user)
 				.shippingAddress(user.getAddresses().get(0))
-				.status(OrderStatus.PROCESSING)
+				.status(OrderStatus.PENDING)
 				.build();
 		
-		List<OrderItem> orderItems = cart.getCartItems().stream().map(item->{
+		cart.getCartItems().forEach(item->{
 			
 			OrderItem orderItem = OrderItem.builder()
 					.order(order)
@@ -63,18 +65,37 @@ public class OrderService {
 					.price(item.getProduct().getPrice())
 					.build();
 			
-			return orderItem;
-		}).collect(Collectors.toList());
+			order.addOrderItem(orderItem);
+		});
+		
+		
+		
+		order.getOrderItems().forEach(orderItem -> {
+			Product product = orderItem.getProduct();
+			
+			if(product.getStockQuantity() < orderItem.getQuantity()) {
+				throw new InsufficientStockException("Not enough stock for " + product.getName() + " while placing order.");
+			}
+			
+			long newStock = product.getStockQuantity() - orderItem.getQuantity();
+			product.setStockQuantity(newStock);
+			
+			/// No need to call productRepository.save(product) here!
+		    // Because the method is @Transactional, Hibernate's "dirty checking"
+		    // will automatically detect the change to the product entity
+		    // and include it in the final transaction commit.
+		});
+		
 		
 		//calculate order price;
-		BigDecimal totalPrice =  orderItems.stream().map(item ->  BigDecimal.valueOf(item.getQuantity())
-				.multiply(item.getPrice()))
-				.reduce(BigDecimal.ZERO,(a,b)->a.add(b));
-		
+		BigDecimal totalPrice =  order.getOrderItems().stream()
+						.map(item ->  item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+						.reduce(BigDecimal.ZERO,(a,b)->a.add(b));
+				
 		order.setTotalAmount(totalPrice);
-		order.setOrderItems(orderItems);
-		
 		Order placedOrder = orderRepository.save(order);
+		
+		cartRepository.delete(cart);
 		
 		return OrderResponseDto.mapToOrderDto(order);
 		

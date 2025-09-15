@@ -25,7 +25,7 @@ public class OrderController {
 	@PostMapping
 	public ResponseEntity<OrderResponseDto> placeOrder(@RequestHeader("X-User-ID") Long userId) {
 		
-	 	 return ResponseEntity.status(HttpStatus.OK).body(orderService.placeOrder(userId));
+	 	 return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(userId));
 		
 	}
 
