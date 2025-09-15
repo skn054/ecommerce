@@ -7,13 +7,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-
+@Builder
 public class OrderItem extends BaseModel{
 	
 	 @ManyToOne
@@ -25,7 +26,7 @@ public class OrderItem extends BaseModel{
 	 @JoinColumn(name = "product_id")
 	 private Product product;
 	 
-	 private int quantity;
+	 private Long quantity;
 	 
 	 private BigDecimal price; 
 

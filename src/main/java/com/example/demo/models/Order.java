@@ -51,6 +51,17 @@ public class Order extends BaseModel{
 	 private OrderStatus status;
 	 
 	 
+	 public void addOrderItem(OrderItem item) {
+		 orderItems.add(item);
+		 item.setOrder(this);
+	 }
+	 
+	 public void deleteOrderItem(OrderItem item) {
+		 this.orderItems.remove(item);
+		 item.setOrder(null);
+	 }
+	 
+	 
 	 
 	
 

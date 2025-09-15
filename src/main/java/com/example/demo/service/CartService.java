@@ -28,13 +28,13 @@ public class CartService {
     
     private final ProductRepository productRepository;
     
-    private final CartItemRepository cartItemRepoistory;
+    private final CartItemRepository cartItemRepository;
 
     public CartService(UserRepository userRepository, CartRepository cartRepository,ProductRepository productRepository,CartItemRepository cartItemRepoistory) {
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
-        this.cartItemRepoistory = cartItemRepoistory;
+        this.cartItemRepository = cartItemRepoistory;
         
     }
 	
@@ -65,12 +65,12 @@ public class CartService {
 	                    return cartRepository.save(newCart);
 	                });
 		 
-		 Optional<CartItem> existingCartItemOpt = cartItemRepoistory.findByCartAndProduct(cart, product);
+		 Optional<CartItem> existingCartItemOpt = cartItemRepository.findByCartAndProduct(cart, product);
 		 if(existingCartItemOpt.isPresent()) {
 			 
 			 CartItem existingItem = existingCartItemOpt.get();
 			 existingItem.setQuantity(existingItem.getQuantity() + cartItemDto.getQuantity());
-			 cartItemRepoistory.save(existingItem);
+			 cartItemRepository.save(existingItem);
 		 }else {
 			 
 			 CartItem newCartItem = CartItem.builder()
@@ -79,7 +79,7 @@ public class CartService {
 					 .cart(cart)
 					 .build();
 			 
-			 cartItemRepoistory.save(newCartItem);
+			 cartItemRepository.save(newCartItem);
 			 
 			 
 		 }
@@ -97,6 +97,8 @@ public class CartService {
     	
     }
     
+    
+    @Transactional
     public void deleteCart(Long userId) {
     	
     	User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found with id"+ userId));

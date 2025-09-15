@@ -1,0 +1,32 @@
+package com.example.demo.controller;
+
+import com.example.demo.dto.OrderResponseDto;
+import com.example.demo.service.OrderService;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+
+
+    OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+	
+	
+	@PostMapping
+	public ResponseEntity<OrderResponseDto> placeOrder(@RequestHeader("X-User-ID") Long userId) {
+		
+	 	 return ResponseEntity.status(HttpStatus.OK).body(orderService.placeOrder(userId));
+		
+	}
+
+}

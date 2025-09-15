@@ -3,6 +3,7 @@ import com.example.demo.service.CartService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +42,8 @@ public class CartController {
 		return ResponseEntity.status(HttpStatus.OK).body(cartService.getCart(userId));
 	}
 	
-	public ResponseEntity<?> deleteCart(@RequestHeader("X-User-ID") Long userId){
+	@DeleteMapping
+	public ResponseEntity<Void> deleteCart(@RequestHeader("X-User-ID") Long userId){
 		
 		cartService.deleteCart(userId);
 		return ResponseEntity.noContent().build();
